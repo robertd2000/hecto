@@ -1,9 +1,7 @@
 use crossterm::event::{read, Event::Key, KeyCode::Char};
 use crossterm::terminal::{enable_raw_mode, disable_raw_mode};
 
-pub struct Editor {
-
-}
+pub struct Editor {}
 
 impl Editor{
     pub fn default() -> Editor {
@@ -11,6 +9,13 @@ impl Editor{
     }
 
     pub fn run(&self) {
+        if let Err(err) = self.repl() {
+            println!("Error: {err}");
+        }
+        print!("Goodbye.\r\n");
+    }
+
+    fn repl(&self) -> Result<(), std::io::Error> {
         enable_raw_mode().unwrap();
 
         loop {
@@ -28,6 +33,7 @@ impl Editor{
                 _ => ()
             }
         }
-        disable_raw_mode().unwrap();
+        disable_raw_mode()?; 
+        Ok(())
     }
 }
