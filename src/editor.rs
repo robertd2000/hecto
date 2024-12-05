@@ -44,6 +44,7 @@ impl Editor{
                 break;
             }
         }
+
         Ok(())
     }
 
