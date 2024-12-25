@@ -16,31 +16,33 @@ pub struct Position{
     pub y: u16
 }
 
-pub struct Terminal  {}
+pub struct Terminal;
 
 impl Terminal {
-    pub fn terminate() -> Result<(), std::io::Error> {
-        disable_raw_mode()?;
+    pub fn terminate() -> Result<(), Error> {
         Self::execute()?;
+        disable_raw_mode()?;
         Ok(())
     }
 
-    pub fn initialize() -> Result<(), std::io::Error> {
+    pub fn initialize() -> Result<(), Error> {
         enable_raw_mode()?;
+        Self::clear_screen()?;
+        Self::move_cursor_to(Position { x:0, y:0 })?;
         Self::execute()?;
         Ok(())
     }
     
-    pub fn clear_screen() -> Result<(), std::io::Error> {
-        let mut stdout = stdout();
-        queue!(stdout, Clear(ClearType::All))
+    pub fn clear_screen() -> Result<(), Error> {
+        queue!(stdout(), Clear(ClearType::All))?;
+        Ok(())
     }
 
-    pub fn size() -> Result<Size, std::io::Error> {
+    pub fn size() -> Result<Size, Error> {
         let (width, height) = size()?;
         Ok(Size{width, height})
     }
-    pub fn move_cursor_to(Position{x, y}: Position) -> Result<(), std::io::Error> {
+    pub fn move_cursor_to(Position{x, y}: Position) -> Result<(), Error> {
         queue!(stdout(), MoveTo(x, y))?;
         Ok(())
     }
@@ -63,5 +65,10 @@ impl Terminal {
     pub fn execute() -> Result<(), Error> {
         stdout().flush()?;
         Ok(()) 
+    }
+
+    pub fn clear_line() -> Result<(), Error> {
+        queue!(stdout(), Clear(ClearType::CurrentLine))?;
+        Ok(())
     }
 }
